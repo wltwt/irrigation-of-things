@@ -1,0 +1,10 @@
+services:
+  flask:
+    build:
+      context: .
+      dockerfile: docker/flask/Dockerfile
+    volumes:
+      - ./app:/app
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
