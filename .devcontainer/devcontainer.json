@@ -1,0 +1,23 @@
+{
+  "name": "Python Dev with Mosquitto",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python"
+      },
+        "extensions": [
+          "ms-python.python",
+          "ms-python.vscode-pylance"
+        ]
+      }
+    },
+
+  "postCreateCommand": "pip install -r requirements.txt",
+  "forwardPorts": [8000, 1883],
+  "remoteEnv": {
+    "PYTHONUNBUFFERED": "1"
+  }
+}
