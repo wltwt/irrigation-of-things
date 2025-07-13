@@ -1,10 +1,13 @@
-from flask import Flask
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 
-app = Flask(__name__)
+app = FastAPI()
 
-@app.route("/")
-def home():
-    return "Test flask app"
+@app.get("/")
+async def read_root():
+    return {"message": "Test FastAPI app"}
 
-if __name__ == "__main__":
-    app.run(debug=True)
+
+@app.get("/status")
+async def status():
+    return JSONResponse(content={"status": "ok"})

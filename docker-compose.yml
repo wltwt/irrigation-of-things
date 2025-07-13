@@ -8,7 +8,10 @@ services:
     command: sleep infinity
     depends_on:
       - mosquitto
-      - db
+      - postgres
+      - influxdb
+    env_file:
+      - .env
     networks:
       - backend
 
@@ -21,7 +24,7 @@ services:
     networks:
       - backend
 
-  db:
+  postgres:
     image: postgres:15
     restart: always
     environment:
@@ -32,6 +35,28 @@ services:
       - "5432:5432"
     networks:
       - backend
+
+  influxdb:
+    image: influxdb:2.7-alpine
+    restart: unless-stopped
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUXDB_USERNAME}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_PASSWORD}
+      DOCKER_INFLUXDB_INIT_ORG: ${INFLUXDB_ORG}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_BUCKET}
+      DOCKER_INFLUXDB_INIT_RETENTION: ${INFLUXDB_RETENTION}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_TOKEN}
+      TZ: Europe/Oslo
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+    networks:
+      - backend
+
+volumes:
+  influxdb-data:
 
 networks:
   backend:
