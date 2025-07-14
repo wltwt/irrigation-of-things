@@ -15,6 +15,20 @@ services:
     networks:
       - backend
 
+  telegraf:
+    image: telegraf
+    restart: always
+    volumes:
+      - ./telegraf/:/etc/telegraf/:ro        # ← hele mappen mountes
+      - ./logs/telegraf:/var/log/telegraf    # ← valgfritt: loggfiler
+    depends_on:
+      - mosquitto
+      - influxdb
+    env_file:
+      - .env
+    networks:
+      - backend
+
   mosquitto:
     image: eclipse-mosquitto
     volumes:
@@ -54,6 +68,7 @@ services:
       - influxdb-data:/var/lib/influxdb2
     networks:
       - backend
+
 
 volumes:
   influxdb-data:
