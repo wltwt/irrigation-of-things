@@ -1,13 +1,11 @@
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from app.database import engine
+from app import models
+from app.routes import user, login
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-@app.get("/")
-async def read_root():
-    return {"message": "Test FastAPI app"}
-
-
-@app.get("/status")
-async def status():
-    return JSONResponse(content={"status": "ok"})
+app.include_router(user.router)
+app.include_router(login.router)

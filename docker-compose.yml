@@ -19,8 +19,8 @@ services:
     image: telegraf
     restart: always
     volumes:
-      - ./telegraf/:/etc/telegraf/:ro        # ← hele mappen mountes
-      - ./logs/telegraf:/var/log/telegraf    # ← valgfritt: loggfiler
+      - ./telegraf/:/etc/telegraf/:ro
+      - ./logs/telegraf:/var/log/telegraf
     depends_on:
       - mosquitto
       - influxdb
@@ -45,6 +45,9 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
     networks:
@@ -71,6 +74,7 @@ services:
 
 
 volumes:
+  postgres-data:
   influxdb-data:
 
 networks:
