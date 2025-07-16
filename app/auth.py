@@ -8,7 +8,6 @@ from .config import SECRET_KEY, ALGORITHM
 from app.database import get_db
 from app import models
 
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 

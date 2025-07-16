@@ -9,10 +9,6 @@ from app.models import User
 
 router = APIRouter()
 
-@router.get("/")
-def root():
-    return {"message": "Hello World"}
-
 @router.post("/register", response_model=schemas.UserOut)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     if crud.get_user_by_username(db, user.username):
