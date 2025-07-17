@@ -31,7 +31,7 @@ print("Data sendt")
 query = f'''
 from(bucket: "metrics")
   |> range(start: -1h)
-  |> filter(fn: (r) => r._measurement == "sensor_data")
+  |> filter(fn: (r) => r._measurement == "mqtt_consumer")
   |> filter(fn: (r) => r.user == "alice")
   |> filter(fn: (r) => r._field == "air_temperature")
 '''

@@ -12,6 +12,12 @@ POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 POSTGRES_DB = os.getenv("POSTGRES_DB")
 DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@postgres:5432/{POSTGRES_DB}"
 
+# InfluxDB
+INFLUX_URL = os.getenv("INFLUXDB_URL", "http://localhost:8086")
+INFLUX_TOKEN = os.getenv("INFLUXDB_TOKEN")
+INFLUX_ORG = os.getenv("INFLUXDB_ORG")
+INFLUX_BUCKET = os.getenv("INFLUXDB_BUCKET", "metrics")
+
 # JWT
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")

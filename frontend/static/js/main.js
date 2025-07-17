@@ -1,5 +1,5 @@
 import { login } from './auth.js';
-import { getSecureData } from './api.js';
+import { getSecureData, getSoilData } from './api.js';
 import { plotData } from './plot.js';
 
 document.getElementById("login-form").addEventListener("submit", async (e) => {
@@ -14,6 +14,10 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
 });
 
 document.getElementById("load-data").addEventListener("click", async () => {
-  const data = await getSecureData();
+  const start = new Date("2025-07-15T00:00:00Z").toISOString();
+  //const end = new Date("2025-07-17T00:00:00Z").toISOString();
+  const end = new Date().toISOString();
+  
+  const data = await getSoilData(start, end);
   plotData(data);
 });
