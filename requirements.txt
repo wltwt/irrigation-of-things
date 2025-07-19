@@ -4,8 +4,10 @@ psycopg2-binary
 influxdb-client
 sqlalchemy
 pydantic[email]
+pydantic-settings
 bcrypt<4
 passlib[bcrypt]
 python-dotenv
 python-jose
 python-multipart
+aiomqtt
