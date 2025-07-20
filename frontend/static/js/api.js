@@ -8,22 +8,17 @@ export async function getSecureData() {
   return await res.json();
 }
 
-export async function getSoilData(start, end) {
-  const url = new URL("/influx/soil", window.location.origin);
+export async function getDashboardData(start, end, sensor = "sensor1", probes = ["1","2"]) {
+  const url = new URL("/influx/dashboard", window.location.origin);
   url.searchParams.set("start", start);
   url.searchParams.set("end", end);
+  url.searchParams.set("sensor", sensor);
+  probes.forEach(p => url.searchParams.append("probes", p));
 
   const res = await fetch(url, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${getToken()}`
-    }
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` }
   });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch soil data");
-  }
-
+  if (!res.ok) throw new Error("Failed to fetch dashboard data");
   return await res.json();
 }
