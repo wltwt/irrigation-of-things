@@ -1,5 +1,11 @@
-// telemetry.h
 #pragma once
+//#include "netset.h"
+#include <PubSubClient.h>
 
-void sendSensorData();
-void logWateringData();
+
+extern PubSubClient client;
+
+void mqttCallback(char* topic, byte* payload, unsigned int length);
+void reconnect();
+void setupMQTT();
+void mqttTask(void *parameter);

@@ -28,3 +28,14 @@ constexpr int NUM_MOISTURE_SENSORS = sizeof(MOISTURE_SENSOR_PINS) / sizeof(int);
 
 // Sensor cutoff values
 constexpr int WATER_CUTOFF = 100;
+
+// Timer intervals in milliseconds
+//constexpr int SEND_INTERVAL_MOISTURE = 60000; // 1 minute
+//constexpr int SEND_INTERVAL_ENV = 60000;      // 1 minute
+//constexpr int SEND_INTERVAL_WATER = 60000;    // 1 minute
+
+// Timers
+#define SEND_INTERVAL_MOISTURE  (10 * 60 * 1000UL)   // 10m
+#define SEND_INTERVAL_ENV       (10 * 60 * 1000UL)   // 10m
+#define SEND_INTERVAL_WATER     (60 * 60 * 1000UL)   // 1h
+#define SEND_INTERVAL_WATER_FAST (5 * 1000UL)        // 5s

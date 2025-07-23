@@ -25,7 +25,7 @@ float readMoisture(int sensorIndex) {
 }
 
 float readWaterLevel() {
-  return analogRead(WATER_SENSOR_PIN); 
+  return analogRead(WATER_SENSOR_PIN);
 }
 
 float readTemperature() {
