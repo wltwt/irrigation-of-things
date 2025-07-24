@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include "netset.h"
+#include "wifisetup.h"
 //#include <WiFi.h>
 //#include <PubSubClient.h>
 
@@ -26,11 +26,13 @@
 
 TaskHandle_t mqttTaskHandle = NULL;
 
-
 void setup() {
   Serial.begin(115200);
   Wire.begin();
+
+  // Initialize states
   initStates();
+
   // Initialize sensors
   sensorsSetup();
 
@@ -45,11 +47,9 @@ void setup() {
 
   // start timers
   setupTimers();
-  //Serial.println(String("Subscribed to topic: ") + (String(CMD_PREFIX)+"/#"));
 }
 
 
 void loop() {
-
 
 }

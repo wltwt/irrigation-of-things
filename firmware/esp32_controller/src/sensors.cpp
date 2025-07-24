@@ -1,8 +1,13 @@
 #include "sensors.h"
 #include "config.h"
+#include "states.h"
+#include "watering.h"
 #include <Adafruit_SHT31.h>
 
 static Adafruit_SHT31 sht30;
+
+bool waterTooLow = false;
+
 
 void sensorsSetup() {
   if (!sht30.begin(0x44)) {
@@ -25,8 +30,28 @@ float readMoisture(int sensorIndex) {
 }
 
 float readWaterLevel() {
-  return analogRead(WATER_SENSOR_PIN);
+    int adc = analogRead(WATER_SENSOR_PIN);
+    float delta_mV = 3300.0 / 4096.0; // 0.805 mV per step
+    float voltage = adc * delta_mV;
+    float litersPerCan = (voltage + 29.61) / 49.75;
+
+    if (!waterTooLow && litersPerCan < (MIN_WATER_LEVEL_THRESHOLD - WATER_LEVEL_HYSTERESE)) {
+        Serial.println("Water level critically low! Stopping pump.");
+        if (xEventGroupGetBits(systemEventGroup) & WATERING_ACTIVE_BIT) {
+            stopWatering();
+        }
+        waterTooLow = true;
+    } else if (waterTooLow && litersPerCan > (MIN_WATER_LEVEL_THRESHOLD + WATER_LEVEL_HYSTERESE)) {
+        // recovery condition
+        Serial.println("Water level recovered.");
+        waterTooLow = false;
+    }
+
+    float totalLiters = litersPerCan * numCans;
+
+    return totalLiters;
 }
+
 
 float readTemperature() {
   float t = sht30.readTemperature();

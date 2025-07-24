@@ -6,14 +6,14 @@
 
 void startWatering(int seconds) {
     if (xEventGroupGetBits(systemEventGroup) & WATERING_ACTIVE_BIT) {
-        Serial.println("Pumpen kjører allerede!");
+        Serial.println("Pump already running");
         return;
     }
-    Serial.printf("💧 Starter vanning i %d sekunder...\n", seconds);
+    Serial.printf("Watering for %d seconds...\n", seconds);
     //digitalWrite(PUMP_PIN, HIGH);
     xEventGroupSetBits(systemEventGroup, WATERING_ACTIVE_BIT);
 
-    xTimerChangePeriod(timerWaterLevel, pdMS_TO_TICKS(5000), 0);
+    xTimerChangePeriod(timerWaterLevel, pdMS_TO_TICKS(SEND_INTERVAL_WATER_FAST), 0);
     xTimerChangePeriod(wateringStopTimer, pdMS_TO_TICKS(seconds * 1000), 0);
     xTimerStart(wateringStopTimer, 0);
 }
@@ -22,5 +22,5 @@ void stopWatering() {
     //digitalWrite(PUMP_PIN, LOW);
     xEventGroupClearBits(systemEventGroup, WATERING_ACTIVE_BIT);
     xTimerChangePeriod(timerWaterLevel, pdMS_TO_TICKS(SEND_INTERVAL_WATER), 0);
-    Serial.println("💧 Stoppet vanning");
+    Serial.println("Watering stopped");
 }

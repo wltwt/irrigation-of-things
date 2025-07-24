@@ -7,49 +7,61 @@
 #include "sensors.h"
 #include "states.h"
 #include "timers.h"
-#include "netset.h"
+#include "wifisetup.h"
 #include "watering.h"
-
-
 
 PubSubClient client(espClient);
 
 
+void handleWaterNow(JsonDocument& doc) {
+    int secs = doc["seconds"] | 5;
+    startWatering(secs);
+}
+
+void handleSetCans(JsonDocument& doc) {
+    int cans = doc["cans"] | -1;
+    if (cans > 0 && cans <= 10) {
+        numCans = cans;
+        Serial.printf("Number of cans updated to: %d\n", numCans);
+    } else {
+        Serial.println("Invalid can count received");
+    }
+}
+
 
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
-  String tpc((char*)topic);
+    String tpc((char*)topic);
+    StaticJsonDocument<128> doc;
 
-  if (tpc == String(CMD_PREFIX) + "/water_now") {
-    // Print payload as a char array for debugging
-    for (unsigned int i = 0; i < length; i++) {
-      Serial.print((char)payload[i]);
-    }
-    StaticJsonDocument<64> doc;
-    deserializeJson(doc, payload, length);
     DeserializationError err = deserializeJson(doc, payload, length);
     if (err) {
         Serial.print("JSON error: ");
         Serial.println(err.c_str());
         return;
-      }
-      int secs = doc["seconds"] | 5;
-      startWatering(secs);
     }
-  }
+
+    if (tpc == String(CMD_PREFIX) + "/water_now") {
+        handleWaterNow(doc);
+    } else if (tpc == String(CMD_PREFIX) + "/set_cans") {
+        handleSetCans(doc);
+    } else {
+        Serial.println("Unknown command: " + tpc);
+    }
+}
 
   
   void reconnect() {
   while (!client.connected()) {
-    Serial.print("Forsøker MQTT-tilkobling...");
+    Serial.print("Attempting MQTT connection...");
     if (client.connect("ESP32Client")) {
-      Serial.println("tilkoblet");
+      Serial.println("connected");
       
       client.subscribe((String(CMD_PREFIX) + "/#").c_str());
       
     } else {
-      Serial.print("feilet, rc=");
+      Serial.print("failed, rc=");
       Serial.print(client.state());
-      Serial.println(" prøver igjen om 5 sekunder");
+      Serial.println("trying again in 5 seconds");
       delay(5000);
     }
   }

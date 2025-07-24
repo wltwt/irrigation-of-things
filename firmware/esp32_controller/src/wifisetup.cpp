@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include "config.h"
-#include "netset.h"
+#include "wifisetup.h"
 
 
 WiFiClient espClient;
