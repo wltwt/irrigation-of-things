@@ -11,3 +11,5 @@ CREATE TABLE IF NOT EXISTS devices (
     user_id UUID REFERENCES users(id),
     name TEXT NOT NULL
 );
+
+ALTER TABLE devices ADD COLUMN IF NOT EXISTS num_cans INTEGER DEFAULT 1;
