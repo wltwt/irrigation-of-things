@@ -10,6 +10,7 @@
 #include "mqtt.h"
 #include "timers.h"
 #include "states.h"
+#include "settings.h"
 
 //#define MOISTURE_SENSOR1_PIN 32
 
@@ -42,11 +43,14 @@ void setup() {
   // setup MQTT
   setupMQTT();
 
-  // Create MQTT task pinned to core 1
+  // create MQTT task pinned to core 1
   xTaskCreatePinnedToCore(mqttTask, "MQTT Task", 4096, NULL, 1, &mqttTaskHandle, 1);
-
+  
   // start timers
   setupTimers();
+  
+  // get latest configuration settings from db
+  loadSettings();
 }
 
 

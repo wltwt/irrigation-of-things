@@ -6,39 +6,45 @@
 
 
 void publishMoisture() {
-    String payload;
+    char topic[64];
+    snprintf(topic, sizeof(topic), "telemetry/%s/%s", USER, DEVICE_ID);
+
+    char payload[128];
+    size_t offset = 0;
     for (int p = 0; p < NUM_MOISTURE_SENSORS; p++) {
         float moisture = readMoisture(p);
-        payload += "plant_moisture,user=" + String(USER) +
-                  ",device=" + String(DEVICE_ID) +
-                  ",probe=" + String(p + 1) +
-                  " value=" + String(moisture) + "\n";
+        int written = snprintf(payload + offset, sizeof(payload) - offset,
+                               "plant_moisture,user=%s,device=%s,probe=%d value=%.2f\n",
+                               USER, DEVICE_ID, p + 1, moisture);
+        if (written < 0 || (size_t)written >= sizeof(payload) - offset) break;
+        offset += written;
     }
-
-    client.publish(("telemetry/" + String(USER) + "/" + String(DEVICE_ID)).c_str(),
-                   payload.c_str());
+    client.publish(topic, payload);
 }
 
 void publishEnvironment() {
     float temp = readTemperature();
     float humidity = readHumidity();
 
-    String payload = "environment,user=" + String(USER) +
-                     ",device=" + String(DEVICE_ID) +
-                     " temperature=" + String(temp) +
-                     ",humidity=" + String(humidity) + "\n";
+    char topic[64];
+    snprintf(topic, sizeof(topic), "telemetry/%s/%s", USER, DEVICE_ID);
 
-    client.publish(("telemetry/" + String(USER) + "/" + String(DEVICE_ID)).c_str(),
-                   payload.c_str());
+    char payload[128];
+    snprintf(payload, sizeof(payload),
+             "environment,user=%s,device=%s temperature=%.2f,humidity=%.2f\n",
+             USER, DEVICE_ID, temp, humidity);
+    client.publish(topic, payload);
 }
 
 void publishWaterLevel() {
     float level = readWaterLevel();
 
-    String payload = "water_level,user=" + String(USER) +
-                     ",device=" + String(DEVICE_ID) +
-                     " value=" + String(level) + "\n";
+    char topic[64];
+    snprintf(topic, sizeof(topic), "telemetry/%s/%s", USER, DEVICE_ID);
 
-    client.publish(("telemetry/" + String(USER) + "/" + String(DEVICE_ID)).c_str(),
-                   payload.c_str());
+    char payload[128];
+    snprintf(payload, sizeof(payload),
+             "water_level,user=%s,device=%s value=%.2f\n",
+             USER, DEVICE_ID, level);
+    client.publish(topic, payload);
 }

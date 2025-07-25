@@ -34,6 +34,7 @@ float readWaterLevel() {
     float delta_mV = 3300.0 / 4096.0; // 0.805 mV per step
     float voltage = adc * delta_mV;
     float litersPerCan = (voltage + 29.61) / 49.75;
+    
 
     if (!waterTooLow && litersPerCan < (MIN_WATER_LEVEL_THRESHOLD - WATER_LEVEL_HYSTERESE)) {
         Serial.println("Water level critically low! Stopping pump.");
@@ -63,6 +64,7 @@ float readTemperature() {
 }
 
 float readHumidity() {
+
   float h = sht30.readHumidity();
   if (isnan(h)) {
     Serial.println("Failed to read humidity");
