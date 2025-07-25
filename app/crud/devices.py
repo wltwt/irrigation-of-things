@@ -16,7 +16,6 @@ def create_device(db: Session, device: devices.DeviceCreate, user_id: UUID):
     return db_device
 
 
-
 def get_device(db: Session, device_id: UUID):
     return db.query(models.Device).filter(models.Device.id == device_id).first()
 

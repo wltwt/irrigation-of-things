@@ -12,6 +12,8 @@ async def mqtt_loop():
         async with get_client() as client:
             await client.subscribe(settings.topic_sub)
             #print("SUB filter :", settings.topic_sub)
+            await client.subscribe("config/+/+")
+            print("SUB filter : config/+/+")  
 
             async for msg in client.messages:
                 await handle_cmd(str(msg.topic), msg.payload)
