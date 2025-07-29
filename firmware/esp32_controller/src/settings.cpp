@@ -6,7 +6,7 @@
 
 
 void loadSettings() {
-    StaticJsonDocument<128> doc;
+    JsonDocument doc;
     doc["command"] = "get_settings";
     doc["user"] = USER;
     doc["device"] = DEVICE_ID_UUID;

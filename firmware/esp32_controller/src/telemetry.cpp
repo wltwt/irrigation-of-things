@@ -30,9 +30,11 @@ void publishEnvironment() {
     snprintf(topic, sizeof(topic), "telemetry/%s/%s", USER, DEVICE_ID);
 
     char payload[128];
+    // Include free heap memory in telemetry for monitoring
+    size_t freeHeap = ESP.getFreeHeap();
     snprintf(payload, sizeof(payload),
-             "environment,user=%s,device=%s temperature=%.2f,humidity=%.2f\n",
-             USER, DEVICE_ID, temp, humidity);
+             "environment,user=%s,device=%s temperature=%.2f,humidity=%.2f,free_heap=%u\n",
+             USER, DEVICE_ID, temp, humidity, static_cast<unsigned int>(freeHeap));
     client.publish(topic, payload);
 }
 
