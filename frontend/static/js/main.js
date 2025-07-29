@@ -1,7 +1,12 @@
-import { login } from './auth.js';
-import { getDashboardData } from './api.js';
-import { plotDashboard } from './plot.js';
+import { login, getToken } from './auth.js';
 
+// Hvis allerede logget inn → send bruker til dashboard
+const token = getToken();
+if (token) {
+  window.location.href = '/static/html/dashboard.html';
+}
+
+// Håndter login-skjema
 document.getElementById("login-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const username = document.getElementById("username").value;
@@ -9,15 +14,6 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
 
   const success = await login(username, password);
   if (success) {
-    document.getElementById("load-data").style.display = "inline";
+    window.location.href = '/static/html/dashboard.html';
   }
-});
-
-document.getElementById("load-data").addEventListener("click", async () => {
-  const start = new Date("2025-07-15T00:00:00Z").toISOString();
-  //const end = new Date("2025-07-17T00:00:00Z").toISOString();
-  const end = new Date().toISOString();
-  
-  const data = await getDashboardData(start, end, "sensor1", ["1", "2"]);
-  plotDashboard(data);
 });

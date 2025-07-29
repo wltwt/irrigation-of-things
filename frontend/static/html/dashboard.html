@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+    <body>
+    <div id="topbar">
+        <h1>Irrigation Dashboard</h1>
+        <button id="logout">Logg ut</button>
+    </div>
+
+    <div id="dashboard">
+        <button id="load-data">Hent data</button>
+        <div id="plot" style="width:100%;max-width:900px;height:500px;"></div>
+    </div>
+
+    <script type="module" src="/static/js/dashboard.js"></script>
+    </body>
+</html>

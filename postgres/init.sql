@@ -13,3 +13,11 @@ CREATE TABLE IF NOT EXISTS devices (
 );
 
 ALTER TABLE devices ADD COLUMN IF NOT EXISTS num_cans INTEGER DEFAULT 1;
+
+CREATE TABLE IF NOT EXISTS probes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    device_id UUID REFERENCES devices(id) ON DELETE CASCADE,
+    channel TEXT NOT NULL,
+    alias TEXT
+);
+

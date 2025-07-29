@@ -15,6 +15,7 @@ class User(Base):
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
 
     devices = relationship("Device", back_populates="user", cascade="all, delete-orphan")
+    
 
 
 class Device(Base):
@@ -26,5 +27,17 @@ class Device(Base):
     num_cans = Column(Integer, default=1)
 
     user = relationship("User", back_populates="devices")
+    probes = relationship("Probe", back_populates="device", cascade="all, delete-orphan")
 
+
+class Probe(Base):
+    __tablename__ = "probes"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    device_id = Column(UUID(as_uuid=True), ForeignKey("devices.id", ondelete="CASCADE"), nullable=False)
+    
+    channel = Column(String, nullable=False)
+    alias = Column(String, nullable=True)
+
+    device = relationship("Device", back_populates="probes")
 
