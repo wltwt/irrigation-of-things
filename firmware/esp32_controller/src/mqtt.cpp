@@ -46,25 +46,25 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
         Serial.println(topic);
     }
 }
-
   
-  void reconnect() {
-  while (!client.connected()) {
-    Serial.print("Attempting MQTT connection...");
-    if (client.connect("ESP32Client")) {
-      Serial.println("MQTT connected");
-      char subTopic[64];
-      snprintf(subTopic, sizeof(subTopic), "%s/#", CMD_PREFIX);
-      client.subscribe(subTopic);
-      Serial.print("Subscribed to topic: ");
-      Serial.println(subTopic);
-    } else {
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" trying again in 5 seconds");
-      delay(5000);
+
+bool reconnect() {
+    if (!client.connected()) {
+        Serial.print("Attempting MQTT connection...");
+        if (client.connect("ESP32Client")) {
+            Serial.println(" MQTT connected");
+            char subTopic[64];
+            snprintf(subTopic, sizeof(subTopic), "%s/#", CMD_PREFIX);
+            client.subscribe(subTopic);
+            Serial.print("Subscribed to topic: ");
+            Serial.println(subTopic);
+        } else {
+            Serial.print("MQTT connect failed, rc=");
+            Serial.print(client.state());
+            Serial.println(" will retry later");
+        }
     }
-  }
+    return client.connected();
 }
 
 void setupMQTT() {
@@ -80,11 +80,15 @@ void setupMQTT() {
 
 void mqttTask(void *parameter) {
   for (;;) {
-    if (!client.connected()) {
-      reconnect();
+    if (WiFi.status() != WL_CONNECTED) {
+        setup_wifi();
     }
-    client.loop();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    if (reconnect()) {
+        client.loop();
+        vTaskDelay(pdMS_TO_TICKS(100));
+    } else {
+        vTaskDelay(pdMS_TO_TICKS(5000));
+    }
   }
 }
 
