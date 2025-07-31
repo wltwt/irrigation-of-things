@@ -8,4 +8,6 @@ To start the fastAPI server locally for development use
 ```bash
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
+# Docs
 
+See the `docs` folder for system architecture information.
