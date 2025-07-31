@@ -9,6 +9,7 @@ export async function login(username, password) {
 
   if (res.ok) {
     localStorage.setItem("token", data.access_token);
+    localStorage.setItem("username", username);
     return true;
   } else {
     alert("Feil brukernavn eller passord");
@@ -22,4 +23,9 @@ export function getToken() {
 
 export function logout() {
   localStorage.removeItem("token");
+  localStorage.removeItem("username");
+}
+
+export function getUsername() {
+  return localStorage.getItem("username");
 }

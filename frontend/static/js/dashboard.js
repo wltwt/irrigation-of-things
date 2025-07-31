@@ -1,10 +1,16 @@
-import { getToken, logout } from './auth.js';
+import { getToken, getUsername, logout } from './auth.js';
 import { getDashboardData } from './api.js';
 import { plotDashboard } from './plot.js';
 
 // Hvis ikke logget inn → redirect til login
 if (!getToken()) {
   window.location.href = "/static/html/index.html";
+} else {
+  const username = getUsername();
+  const userInfo = document.getElementById("user-info");
+  if (username && userInfo) {
+    userInfo.textContent = `Brukernavn: ${username}`;
+  }
 }
 
 // Hent data når bruker klikker

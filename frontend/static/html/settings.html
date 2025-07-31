@@ -2,30 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard</title>
+  <title>Settings</title>
   
   <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon/favicon-16x16.png">
   <link rel="apple-touch-icon" href="/static/favicon/apple-touch-icon.png">
   <link rel="manifest" href="/static/favicon/site.webmanifest">
   <link rel="icon" href="/static/favicon/favicon.ico" type="image/x-icon">
-  
-  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+
   <link rel="stylesheet" href="/static/css/styles.css">
 </head>
     <body>
     <div id="topbar">
-        <h1>Dashboard</h1>
-        <a href="/static/html/settings.html" id="settings-link">Settings</a>
+        <h1>Settings</h1>
+        <a href="/static/html/dashboard.html" id="dashboard-link">Dashboard</a>
         <span id="user-info"></span>
         <button id="logout">Logg ut</button>
     </div>
-
-    <div id="dashboard">
-        <button id="load-data">Hent data</button>
-        <div id="plot" style="width:100%;max-width:900px;height:500px;"></div>
+    <div id="settings">
+        <h2>Systemkonfigurasjon</h2>
+        <div id="settings-container">Laster...</div>
     </div>
+    
 
-    <script type="module" src="/static/js/dashboard.js"></script>
+    <script type="module" src="/static/js/settings.js"></script>
     </body>
 </html>
