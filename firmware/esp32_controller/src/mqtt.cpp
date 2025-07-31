@@ -79,16 +79,19 @@ void setupMQTT() {
 }
 
 void mqttTask(void *parameter) {
-  for (;;) {
+  while (true) {
     if (WiFi.status() != WL_CONNECTED) {
-        setup_wifi();
+      setup_wifi();
     }
-    if (reconnect()) {
-        client.loop();
-        vTaskDelay(pdMS_TO_TICKS(100));
-    } else {
-        vTaskDelay(pdMS_TO_TICKS(5000));
+
+    if (!client.connected()) {
+      reconnect();
+      vTaskDelay(pdMS_TO_TICKS(500));
     }
+
+    client.loop();
+
+    vTaskDelay(pdMS_TO_TICKS(100));
   }
 }
 
