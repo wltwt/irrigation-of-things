@@ -96,7 +96,6 @@ void exit_state(AppState old_state)
             break;
 
         case AppState::Running:
-            // Eksempel: sørg for at utganger stoppes.
             log_info("Leaving Running");
             break;
 
@@ -115,15 +114,12 @@ void update_current_state()
             break;
 
         case AppState::Idle:
-            // Vent på kommandoer.
             break;
 
         case AppState::Running:
-            // Kjør applikasjonslogikk uten blokkering.
             break;
 
         case AppState::Error:
-            // Hold systemet i sikker tilstand.
             break;
     }
 }

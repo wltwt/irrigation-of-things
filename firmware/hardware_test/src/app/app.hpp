@@ -9,7 +9,7 @@ enum class AppCommand
     EnterMotorTest
 };
 
-//void app_init();
+
 void app_update();
 
 bool app_request_command(AppCommand command);

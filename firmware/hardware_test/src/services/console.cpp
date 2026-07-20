@@ -1,5 +1,6 @@
 #include "services/console.hpp"
 #include "app/app.hpp"
+#include "hardware/valve.hpp"
 
 #include <Arduino.h>
 #include <WiFi.h>
@@ -13,7 +14,7 @@ String input;
 void run_command(const String& command)
 {
     if (command == "help") {
-        console_println("Commands: help, status, reboot, start, stop");
+        console_println("Commands: help, status, reboot, start, stop, testing something");
 
     } else if (command == "status") {
         client.print("WiFi: ");
@@ -47,6 +48,18 @@ void run_command(const String& command)
         } else {
             client.println("Stop command failed.");
         }
+    } else if (command == "valve open")
+    {
+        valve_open();
+        client.println("Valve open");
+    } else if (command == "valve close")
+    {
+        valve_close();
+        client.println("Valve close");
+    } else if (command == "valve stop")
+    {
+        valve_stop();
+        client.println("Valve stop");
 
     } else if (!command.isEmpty()) {
         client.println("Unknown command. Type 'help'.");

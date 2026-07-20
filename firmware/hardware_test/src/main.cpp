@@ -4,6 +4,7 @@
 #include "services/ota.hpp"
 #include "services/wifi.hpp"
 #include "app/app.hpp"
+#include "hardware/valve.hpp"
 
 void setup()
 {
@@ -12,6 +13,8 @@ void setup()
     wifi_init();
     ota_init();
     console_init();
+
+    valve_init();
     //app_init();
 }
 
