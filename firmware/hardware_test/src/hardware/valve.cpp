@@ -25,3 +25,8 @@ void valve_stop()
 {
     relay_off(board.valve);
 }
+
+bool valve_status()
+{
+    return relay_is_on(board.valve);
+}

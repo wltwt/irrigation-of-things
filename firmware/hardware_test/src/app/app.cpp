@@ -1,5 +1,6 @@
 #include "app.hpp"
 #include "logging/log.hpp"
+#include "hardware/water_level.hpp"
 
 #include <Arduino.h>
 
@@ -181,5 +182,7 @@ void app_update()
         process_command(command);
     }
 
+    
+    water_level_update();
     update_current_state();
 }
