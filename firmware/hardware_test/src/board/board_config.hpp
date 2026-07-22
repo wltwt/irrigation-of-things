@@ -5,16 +5,21 @@ struct RelayConfig {
     bool active_low;
 };
 
-struct SensorConfig {
+struct AnalogSensorConfig {
     int adc_pin;
+};
+
+struct FlowSensorConfig {
+    int pulse_pin;
 };
 
 struct BoardConfig {
     RelayConfig valve;
     RelayConfig pump;
 
-    SensorConfig water_level_sensor;
-    SensorConfig moisture;
+    AnalogSensorConfig water_level_sensor;
+    AnalogSensorConfig moisture;
+    FlowSensorConfig flow_sensor;
 };
 
 inline constexpr BoardConfig board {
@@ -27,4 +32,5 @@ inline constexpr BoardConfig board {
     // water level sensor pin
     .water_level_sensor = {34},
     .moisture = {33},
+    .flow_sensor = {35},
 };

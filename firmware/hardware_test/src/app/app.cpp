@@ -1,4 +1,6 @@
 #include "app.hpp"
+#include "app/operations/dispense.hpp"
+#include "app/reservoir.hpp"
 #include "logging/log.hpp"
 #include "hardware/water_level.hpp"
 
@@ -6,15 +8,8 @@
 
 namespace {
 
-enum class AppState
-{
-    Initializing,
-    Idle,
-    Running,
-    Error
-};
-
 AppState state = AppState::Initializing;
+Operation active_operation = Operation::None;
 AppCommand pending_command = AppCommand::None;
 
 void process_command(AppCommand command);
@@ -35,8 +30,8 @@ const char* state_to_string(AppState state)
     switch (state) {
         case AppState::Initializing: return "Initializing";
         case AppState::Idle:         return "Idle";
-        case AppState::Running:      return "Running";
-        case AppState::Error:        return "Error";
+        case AppState::Busy:         return "Busy";
+        case AppState::Fault:        return "Fault";
     }
 
     return "Unknown";
@@ -77,12 +72,12 @@ void enter_state(AppState new_state)
             log_info("Entering Idle");
             break;
 
-        case AppState::Running:
-            log_info("Entering Running");
+        case AppState::Busy:
+            log_info("Entering Busy");
             break;
 
-        case AppState::Error:
-            log_info("Entering Error");
+        case AppState::Fault:
+            log_info("Entering Fault");
             break;
     }
 }
@@ -96,11 +91,11 @@ void exit_state(AppState old_state)
         case AppState::Idle:
             break;
 
-        case AppState::Running:
-            log_info("Leaving Running");
+        case AppState::Busy:
+            log_info("Leaving Busy");
             break;
 
-        case AppState::Error:
+        case AppState::Fault:
             break;
     }
 }
@@ -117,10 +112,18 @@ void update_current_state()
         case AppState::Idle:
             break;
 
-        case AppState::Running:
+        case AppState::Busy:
+            if (active_operation == Operation::Dispense) {
+                const DispenseResult result = dispense_update();
+
+                if (result != DispenseResult::Running) {
+                    active_operation = Operation::None;
+                    change_state(AppState::Idle);
+                }
+            }
             break;
 
-        case AppState::Error:
+        case AppState::Fault:
             break;
     }
 }
@@ -129,15 +132,22 @@ void process_command(AppCommand command)
 {
     switch (command) {
         case AppCommand::Start:
-            if (state == AppState::Idle && hardware_ready()) {
-                change_state(AppState::Running);
+            if (state == AppState::Idle &&
+                hardware_ready() &&
+                dispense_start(1.0f)) {
+                active_operation = Operation::Dispense;
+                change_state(AppState::Busy);
             } else {
                 log_info("Start rejected");
             }
             break;
 
         case AppCommand::Stop:
-            if (state == AppState::Running) {
+            if (state == AppState::Busy) {
+                if (active_operation == Operation::Dispense) {
+                    dispense_cancel();
+                }
+                active_operation = Operation::None;
                 change_state(AppState::Idle);
             } else {
                 log_info("Stop rejected");
@@ -145,7 +155,8 @@ void process_command(AppCommand command)
             break;
 
         case AppCommand::Reset:
-            if (state != AppState::Running) {
+            if (state != AppState::Busy) {
+                active_operation = Operation::None;
                 change_state(AppState::Initializing);
             } else {
                 log_info("Reset rejected");
@@ -153,6 +164,7 @@ void process_command(AppCommand command)
             break;
 
         case AppCommand::None:
+        case AppCommand::EnterMotorTest:
             break;
     }
 }
@@ -173,6 +185,33 @@ bool app_request_command(AppCommand command)
     return true;
 }
 
+AppState app_get_state()
+{
+    return state;
+}
+
+Operation app_get_operation()
+{
+    return active_operation;
+}
+
+const char* app_state_name(AppState state)
+{
+    return state_to_string(state);
+}
+
+const char* operation_name(Operation operation)
+{
+    switch (operation) {
+        case Operation::None:        return "None";
+        case Operation::Dispense:    return "Dispense";
+        case Operation::Irrigation:  return "Irrigation";
+        case Operation::Calibration: return "Calibration";
+    }
+
+    return "Unknown";
+}
+
 void app_update()
 {
     if (pending_command != AppCommand::None) {
@@ -182,7 +221,7 @@ void app_update()
         process_command(command);
     }
 
-    
     water_level_update();
+    reservoir_update();
     update_current_state();
 }

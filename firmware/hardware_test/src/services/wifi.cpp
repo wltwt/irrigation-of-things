@@ -22,14 +22,6 @@ void wifi_init()
     WiFi.setSleep(false);
 
     connect();
-
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print('.');
-    }
-
-    Serial.print("\nConnected, IP address: ");
-    Serial.println(WiFi.localIP());
 }
 
 void wifi_update()

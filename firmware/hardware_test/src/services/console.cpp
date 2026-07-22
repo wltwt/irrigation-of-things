@@ -1,11 +1,14 @@
 #include "services/console.hpp"
 
 #include "app/app.hpp"
+#include "app/operations/dispense.hpp"
+#include "hardware/flow_sensor.hpp"
 #include "hardware/valve.hpp"
 #include "hardware/water_level.hpp"
 #include "app/reservoir.hpp"
 
 #include <Arduino.h>
+#include <esp_system.h>
 #include <WiFi.h>
 
 namespace {
@@ -28,7 +31,6 @@ void command_start();
 void command_stop();
 void command_valve_open();
 void command_valve_close();
-void command_valve_stop();
 void command_water_level();
 void command_reservoir();
 
@@ -41,38 +43,59 @@ constexpr CommandEntry commands[] = {
     {"stop",        command_stop},
     {"valve open",  command_valve_open},
     {"valve close", command_valve_close},
-    {"valve stop",  command_valve_stop},
     {"water level", command_water_level},
     {"reservoir",   command_reservoir},
 };
+
+const char* wifi_status_name(wl_status_t status)
+{
+    switch (status) {
+        case WL_IDLE_STATUS:     return "idle";
+        case WL_NO_SSID_AVAIL:   return "SSID unavailable";
+        case WL_SCAN_COMPLETED:  return "scan completed";
+        case WL_CONNECTED:       return "connected";
+        case WL_CONNECT_FAILED:  return "connection failed";
+        case WL_CONNECTION_LOST: return "connection lost";
+        case WL_DISCONNECTED:    return "disconnected";
+        case WL_NO_SHIELD:       return "no Wi-Fi hardware";
+    }
+
+    return "unknown";
+}
 
 void command_help()
 {
     console_println(
         "Commands: help, status, reboot, start, stop, "
-        "valve open, valve close, valve stop"
+        "valve open, valve close"
     );
 }
 
 void command_status()
 {
-    const bool connected = WiFi.status() == WL_CONNECTED;
+    const wl_status_t wifi_status = WiFi.status();
+    const uint32_t pulses = flow_sensor_pulse_count();
 
-    client.print("WiFi: ");
-    client.println(connected ? "connected" : "disconnected");
+    client.printf("Uptime: %lu ms\n", static_cast<unsigned long>(millis()));
+    client.printf("WiFi: %s\n", wifi_status_name(wifi_status));
 
-    if (connected) {
+    if (wifi_status == WL_CONNECTED) {
         client.print("IP: ");
         client.println(WiFi.localIP());
+        client.printf("RSSI: %d dBm\n", WiFi.RSSI());
     }
 
-    const bool valve_is_open = valve_status();
-
-    client.println(
-        valve_is_open
-            ? "valve: open"
-            : "valve: closed"
-    );
+    client.printf("App state: %s\n", app_state_name(app_get_state()));
+    client.printf("Operation: %s\n", operation_name(app_get_operation()));
+    client.printf("Dispense state: %s\n", dispense_state_name());
+    client.printf("Flow pulses: %lu\n", static_cast<unsigned long>(pulses));
+    client.printf("Flow volume: %.3f L\n", flow_sensor_liters(pulses));
+    client.printf(
+        "Reset reason: %d\n",
+        static_cast<int>(esp_reset_reason()));
+    client.printf(
+        "Free heap: %lu bytes\n",
+        static_cast<unsigned long>(ESP.getFreeHeap()));
 }
 
 void command_reboot()
@@ -108,20 +131,24 @@ void command_stop()
 
 void command_valve_open()
 {
+    if (app_get_state() == AppState::Busy) {
+        client.println("Valve command rejected: operation active.");
+        return;
+    }
+
     valve_open();
     client.println("Valve opening.");
 }
 
 void command_valve_close()
 {
+    if (app_get_state() == AppState::Busy) {
+        client.println("Valve command rejected: operation active.");
+        return;
+    }
+
     valve_close();
     client.println("Valve closing.");
-}
-
-void command_valve_stop()
-{
-    valve_stop();
-    client.println("Valve stopped.");
 }
 
 void command_water_level()
@@ -136,7 +163,6 @@ void command_water_level()
 
 void command_reservoir()
 {
-    reservoir_update();
     const ReservoirState state = reservoir_get_state();
 
     client.printf("reservoir");
